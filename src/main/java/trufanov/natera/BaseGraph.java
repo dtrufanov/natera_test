@@ -72,7 +72,7 @@ public abstract class BaseGraph<N> implements Graph<N> {
         List<Edge<N>> edges = new ArrayList<>();
         for (N node : nodes) {
             if (prev != null) {
-                edges.add(Edge.ordered(prev, node));
+                edges.add(isDirected() ? Edge.ordered(prev, node) : Edge.unordered(prev, node));
             }
             prev = node;
         }

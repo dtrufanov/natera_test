@@ -9,7 +9,9 @@ public class UndirectedGraph<N> extends BaseGraph<N> {
         addVertex(node2);
         Set<N> successors1 = nodeMap.get(node1);
         Set<N> successors2 = nodeMap.get(node2);
-        return successors1.add(node2) || successors2.add(node1);
+        boolean add1 = successors1.add(node2);
+        boolean add2 = successors2.add(node1);
+        return add1 || add2;
     }
 
     public boolean isDirected() {
