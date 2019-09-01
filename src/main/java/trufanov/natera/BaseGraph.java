@@ -11,14 +11,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class BaseGraph<N> implements Graph<N> {
 
     protected Map<N, Set<N>> nodeMap = new HashMap<>();
+    protected ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
 
     public boolean addVertex(N node) {
+        readWriteLock.writeLock().lock();
+        try {
+            return addVertexInternal(node);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    private boolean addVertexInternal(N node) {
         checkNotNull(node);
         if (nodeMap.containsKey(node)) {
             return false;
@@ -27,13 +39,32 @@ public abstract class BaseGraph<N> implements Graph<N> {
         return true;
     }
 
-    public List<Edge<N>> getPath(N from, N to) {
-        if (!nodeMap.containsKey(from) || !nodeMap.containsKey(to)) {
-            return Collections.emptyList();
+    @Override
+    public boolean addEdge(N node1, N node2) {
+        readWriteLock.writeLock().lock();
+        try {
+            addVertexInternal(node1);
+            addVertexInternal(node2);
+            return addEdgeInternal(node1, node2);
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
-        List<N> nodes = getNodesPath(from, to);
+    }
 
-        return nodesToEdges(nodes);
+    protected abstract boolean addEdgeInternal(N node1, N node2);
+
+    public List<Edge<N>> getPath(N from, N to) {
+        readWriteLock.readLock().lock();
+        try {
+            if (!nodeMap.containsKey(from) || !nodeMap.containsKey(to)) {
+                return Collections.emptyList();
+            }
+            List<N> nodes = getNodesPath(from, to);
+
+            return nodesToEdges(nodes);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
     private List<N> getNodesPath(N from, N to) {

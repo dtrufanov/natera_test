@@ -4,9 +4,7 @@ import java.util.Set;
 
 public class UndirectedGraph<N> extends BaseGraph<N> {
 
-    public boolean addEdge(N node1, N node2) {
-        addVertex(node1);
-        addVertex(node2);
+    public boolean addEdgeInternal(N node1, N node2) {
         Set<N> successors1 = nodeMap.get(node1);
         Set<N> successors2 = nodeMap.get(node2);
         boolean add1 = successors1.add(node2);

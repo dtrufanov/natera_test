@@ -14,11 +14,11 @@ public abstract class Edge<N> {
     }
 
     public static <N> Edge<N> ordered(N source, N target) {
-        return new Edge.Ordered<N>(source, target);
+        return new Edge.Ordered<>(source, target);
     }
 
     public static <N> Edge<N> unordered(N nodeU, N nodeV) {
-        return new Edge.Unordered<N>(nodeV, nodeU);
+        return new Edge.Unordered<>(nodeV, nodeU);
     }
 
     public N node1() {
